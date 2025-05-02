@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Muamera's Pharmacy Shop</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+            font-weight: 500;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: #4a90e2;
+            box-shadow: 0 0 5px rgba(74,144,226,0.3);
+        }
+        button {
+            padding: 12px 20px;
+            margin-right: 10px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            border: none;
+            border-radius: 4px;
+            font-weight: 600;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            opacity: 0.9;
+        }
+        #createBtn {
+            background-color: #4CAF50;
+            color: white;
+        }
+        #updateBtn {
+            background-color: #2196F3;
+            color: white;
+        }
+        #deleteBtn {
+            background-color: #f44336;
+            color: white;
+        }
+        #getAllBtn {
+            background-color: #9C27B0;
+            color: white;
+        }
+        #categoryBtn {
+            background-color: #FF9800;
+            color: white;
+        }
+        #viewOrdersBtn {
+            background-color: #FF9800;
+            color: white;
+        }
+        .back-button {
+            background-color: #2196F3;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+        .product-list {
+            margin-top: 20px;
+        }
+        .product-item {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            background-color: white;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .category-group {
+            margin-bottom: 20px;
+            background-color: white;
+            padding: 15px;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .category-title {
+            color: #333;
+            font-size: 1.2em;
+            margin-bottom: 10px;
+            padding-bottom: 5px;
+            border-bottom: 2px solid #FF9800;
+        }
+        .product-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .product-row:last-child {
+            border-bottom: none;
+        }
+        .product-name {
+            color: #333;
+        }
+        .product-quantity {
+            color: #666;
+            font-weight: 500;
+        }
+        .orders-list {
+            margin-top: 20px;
+        }
+        .order-item {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            background-color: white;
+        }
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        .order-id {
+            font-weight: bold;
+            color: #333;
+        }
+        .order-date {
+            color: #666;
+            font-size: 0.9em;
+        }
+        .order-details {
+            margin-top: 10px;
+        }
+        .order-detail-row {
+            display: flex;
+            margin-bottom: 5px;
+        }
+        .order-detail-label {
+            font-weight: 500;
+            color: #666;
+            width: 120px;
+        }
+        .order-detail-value {
+            color: #333;
+        }
+        .view-container {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Muamera's Pharmacy Shop</h1>
+        
+        <div id="productForm" class="view-container">
+            <div class="form-group">
+                <label>ID (for update/delete):</label>
+                <input type="text" id="productId" placeholder="Leave empty for new product">
+            </div>
+
+            <div class="form-group">
+                <label>Name:</label>
+                <input type="text" id="name" required>
+            </div>
+
+            <div class="form-group">
+                <label>Description:</label>
+                <textarea id="description" rows="3"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>Price:</label>
+                <input type="number" id="price" step="0.01" required>
+            </div>
+
+            <div class="form-group">
+                <label>Quantity:</label>
+                <input type="number" id="quantity" required>
+            </div>
+
+            <div class="form-group">
+                <label>Category:</label>
+                <input type="text" id="category">
+            </div>
+
+            <button id="createBtn" onclick="createProduct()">Create</button>
+            <button id="updateBtn" onclick="updateProduct()">Update</button>
+            <button id="deleteBtn" onclick="deleteProduct()">Delete</button>
+            <button id="getAllBtn" onclick="openProductsWindow()">Get All Products</button>
+            <button id="categoryBtn" onclick="openCategoryWindow()">View by Categories</button>
+            <button id="viewOrdersBtn" onclick="showOrders()">View Orders</button>
+
+            <div id="productList" class="product-list"></div>
+        </div>
+
+        <div id="ordersView" class="view-container">
+            <button class="back-button" onclick="showProductForm()">← Back to Products</button>
+            <h2>Orders</h2>
+            <div id="ordersList" class="orders-list"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:8080';
+
+        function showProductForm() {
+            document.getElementById('productForm').style.display = 'block';
+            document.getElementById('ordersView').style.display = 'none';
+        }
+
+        function showOrders() {
+            document.getElementById('productForm').style.display = 'none';
+            document.getElementById('ordersView').style.display = 'block';
+            loadOrders();
+        }
+
+        function loadOrders() {
+            fetch(`${API_URL}/orders`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to load orders');
+                    }
+                    return response.json();
+                })
+                .then(orders => {
+                    const ordersList = document.getElementById('ordersList');
+                    ordersList.innerHTML = '';
+
+                    if (orders.length === 0) {
+                        ordersList.innerHTML = '<p>No orders found.</p>';
+                        return;
+                    }
+
+                    orders.forEach(order => {
+                        const orderItem = document.createElement('div');
+                        orderItem.className = 'order-item';
+                        orderItem.innerHTML = `
+                            <div class="order-header">
+                                <span class="order-id">Order #${order.id}</span>
+                                <span class="order-date">${new Date(order.created_at).toLocaleString()}</span>
+                            </div>
+                            <div class="order-details">
+                                <div class="order-detail-row">
+                                    <span class="order-detail-label">Product:</span>
+                                    <span class="order-detail-value">${order.product_name}</span>
+                                </div>
+                                <div class="order-detail-row">
+                                    <span class="order-detail-label">Quantity:</span>
+                                    <span class="order-detail-value">${order.quantity}</span>
+                                </div>
+                                <div class="order-detail-row">
+                                    <span class="order-detail-label">Unit Price:</span>
+                                    <span class="order-detail-value">$${order.product_price.toFixed(2)}</span>
+                                </div>
+                                <div class="order-detail-row">
+                                    <span class="order-detail-label">Total Price:</span>
+                                    <span class="order-detail-value">$${order.total_price.toFixed(2)}</span>
+                                </div>
+                                <div class="order-detail-row">
+                                    <span class="order-detail-label">Customer:</span>
+                                    <span class="order-detail-value">${order.customer_name}</span>
+                                </div>
+                                <div class="order-detail-row">
+                                    <span class="order-detail-label">Address:</span>
+                                    <span class="order-detail-value">${order.customer_address}</span>
+                                </div>
+                            </div>
+                        `;
+                        ordersList.appendChild(orderItem);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error loading orders:', error);
+                    const ordersList = document.getElementById('ordersList');
+                    ordersList.innerHTML = '<p>Error loading orders. Please try again later.</p>';
+                });
+        }
+
+        function openProductsWindow() {
+            const productsWindow = window.open('', 'Products', 'width=800,height=600');
+            productsWindow.document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>All Products</title>
+                    <style>
+                        body {
+                            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                            padding: 20px;
+                            background-color: #f5f5f5;
+                        }
+                        .product-item {
+                            background-color: white;
+                            border: 1px solid #ddd;
+                            padding: 15px;
+                            margin-bottom: 15px;
+                            border-radius: 4px;
+                            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                        }
+                        h1 {
+                            color: #333;
+                            text-align: center;
+                        }
+                        strong {
+                            color: #666;
+                        }
+                    </style>
+                </head>
+                <body>
+                    <h1>All Products</h1>
+                    <div id="productList"></div>
+                </body>
+                </html>
+            `);
+
+            getAllProducts(productsWindow);
+        }
+
+        async function getAllProducts(productsWindow) {
+            try {
+                const response = await fetch(`${API_URL}/products`);
+                const products = await response.json();
+                displayProducts(products, productsWindow);
+            } catch (error) {
+                alert('Error fetching products: ' + error);
+            }
+        }
+
+        function displayProducts(products, window) {
+            const productList = window.document.getElementById('productList');
+            productList.innerHTML = '';
+
+            products.forEach(product => {
+                const div = window.document.createElement('div');
+                div.className = 'product-item';
+                div.innerHTML = `
+                    <strong>ID:</strong> ${product.id}<br>
+                    <strong>Name:</strong> ${product.name}<br>
+                    <strong>Description:</strong> ${product.description}<br>
+                    <strong>Price:</strong> $${product.price}<br>
+                    <strong>Quantity:</strong> ${product.quantity}<br>
+                    <strong>Category:</strong> ${product.category}<br>
+                    <strong>Created:</strong> ${new Date(product.created_at).toLocaleString()}<br>
+                    <strong>Updated:</strong> ${new Date(product.updated_at).toLocaleString()}<br>
+                `;
+                productList.appendChild(div);
+            });
+        }
+
+        async function createProduct() {
+            const product = {
+                name: document.getElementById('name').value,
+                description: document.getElementById('description').value,
+                price: parseFloat(document.getElementById('price').value),
+                quantity: parseInt(document.getElementById('quantity').value),
+                category: document.getElementById('category').value
+            };
+
+            try {
+                const response = await fetch(`${API_URL}/products`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(product)
+                });
+                const data = await response.json();
+                alert('Product created successfully!');
+                clearForm();
+            } catch (error) {
+                alert('Error creating product: ' + error);
+            }
+        }
+
+        async function updateProduct() {
+            const id = document.getElementById('productId').value;
+            if (!id) {
+                alert('Please enter a product ID');
+                return;
+            }
+
+            const product = {
+                name: document.getElementById('name').value,
+                description: document.getElementById('description').value,
+                price: parseFloat(document.getElementById('price').value),
+                quantity: parseInt(document.getElementById('quantity').value),
+                category: document.getElementById('category').value
+            };
+
+            try {
+                const response = await fetch(`${API_URL}/products/${id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(product)
+                });
+                const data = await response.json();
+                alert('Product updated successfully!');
+                clearForm();
+            } catch (error) {
+                alert('Error updating product: ' + error);
+            }
+        }
+
+        async function deleteProduct() {
+            const id = document.getElementById('productId').value;
+            if (!id) {
+                alert('Please enter a product ID');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_URL}/products/${id}`, {
+                    method: 'DELETE'
+                });
+                alert('Product deleted successfully!');
+                clearForm();
+            } catch (error) {
+                alert('Error deleting product: ' + error);
+            }
+        }
+
+        function clearForm() {
+            document.getElementById('productId').value = '';
+            document.getElementById('name').value = '';
+            document.getElementById('description').value = '';
+            document.getElementById('price').value = '';
+            document.getElementById('quantity').value = '';
+            document.getElementById('category').value = '';
+        }
+
+        function openCategoryWindow() {
+            const categoryWindow = window.open('', 'Products by Category', 'width=600,height=800');
+            categoryWindow.document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Products by Category</title>
+                    <style>
+                        body {
+                            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                            padding: 20px;
+                            background-color: #f5f5f5;
+                        }
+                        .category-group {
+                            margin-bottom: 20px;
+                            background-color: white;
+                            padding: 15px;
+                            border-radius: 4px;
+                            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                        }
+                        .category-title {
+                            color: #333;
+                            font-size: 1.2em;
+                            margin-bottom: 10px;
+                            padding-bottom: 5px;
+                            border-bottom: 2px solid #FF9800;
+                        }
+                        .product-row {
+                            display: flex;
+                            justify-content: space-between;
+                            padding: 5px 0;
+                            border-bottom: 1px solid #eee;
+                        }
+                        .product-row:last-child {
+                            border-bottom: none;
+                        }
+                        .product-name {
+                            color: #333;
+                        }
+                        .product-quantity {
+                            color: #666;
+                            font-weight: 500;
+                        }
+                        h1 {
+                            color: #333;
+                            text-align: center;
+                            margin-bottom: 30px;
+                        }
+                    </style>
+                </head>
+                <body>
+                    <h1>Products by Category</h1>
+                    <div id="categoryList"></div>
+                </body>
+                </html>
+            `);
+
+            getProductsByCategory(categoryWindow);
+        }
+
+        async function getProductsByCategory(window) {
+            try {
+                const response = await fetch(`${API_URL}/products`);
+                const products = await response.json();
+                displayProductsByCategory(products, window);
+            } catch (error) {
+                alert('Error fetching products: ' + error);
+            }
+        }
+
+        function displayProductsByCategory(products, window) {
+            const categoryList = window.document.getElementById('categoryList');
+            categoryList.innerHTML = '';
+
+            // Group products by category
+            const productsByCategory = {};
+            products.forEach(product => {
+                const category = product.category || 'Uncategorized';
+                if (!productsByCategory[category]) {
+                    productsByCategory[category] = [];
+                }
+                productsByCategory[category].push(product);
+            });
+
+            // Sort categories alphabetically
+            const sortedCategories = Object.keys(productsByCategory).sort();
+
+            // Display each category group
+            sortedCategories.forEach(category => {
+                const categoryDiv = window.document.createElement('div');
+                categoryDiv.className = 'category-group';
+                
+                const title = window.document.createElement('div');
+                title.className = 'category-title';
+                title.textContent = category;
+                categoryDiv.appendChild(title);
+
+                // Sort products by name within each category
+                const sortedProducts = productsByCategory[category].sort((a, b) => 
+                    a.name.localeCompare(b.name)
+                );
+
+                sortedProducts.forEach(product => {
+                    const productRow = window.document.createElement('div');
+                    productRow.className = 'product-row';
+                    productRow.innerHTML = `
+                        <span class="product-name">${product.name}</span>
+                        <span class="product-quantity">${product.quantity} in stock</span>
+                    `;
+                    categoryDiv.appendChild(productRow);
+                });
+
+                categoryList.appendChild(categoryDiv);
+            });
+        }
+
+        // Show product form by default
+        showProductForm();
+    </script>
+</body>
+</html> 
