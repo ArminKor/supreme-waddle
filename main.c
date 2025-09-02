@@ -2,16 +2,6 @@
 
 int main(void)
 {
-	initCLOCK();
-	initSYSTIM();
-	initDEBUG("", '4', "STM32H743 PLT Control Board");
-	initFMC();
-	initGUI();
-	initADC();
-	initTOUCH();
-	initCTRL();
-	debugMAIN(0, "init done\n");
-
 	uint32_t timer = getSYSTIM();
 	while(1)
 	{
